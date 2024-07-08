@@ -3,19 +3,17 @@ import { StatusBar } from "expo-status-bar";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
+import Logo from "../components/Logo";
 import colors from "../constants/colors";
-import { POPPINS_BOLD, POPPINS_REGULAR } from "../constants/fonts";
-import { LogoSvg, PathSvg, cardsUri } from "../constants/images";
+import { POPPINS_REGULAR } from "../constants/fonts";
+import { PathSvg, cardsUri } from "../constants/images";
 
 export default function App() {
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollViewContainer}>
 				<View style={styles.innerContainer}>
-					<View style={styles.logoContainer}>
-						<LogoSvg style={styles.logo} />
-						<Text style={styles.appName}>Pixel</Text>
-					</View>
+					<Logo />
 					<Image style={styles.cards} source={cardsUri} resizeMode="contain" />
 
 					<View style={styles.titleContainer}>
@@ -62,19 +60,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		paddingHorizontal: 16
-	},
-	logoContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 4,
-		marginBottom: 16
-	},
-	logo: { width: 40, height: 46 },
-	appName: {
-		fontSize: 30,
-		color: "white",
-		fontWeight: "bold",
-		fontFamily: POPPINS_BOLD
 	},
 	cards: { width: "100%", height: 300, maxWidth: 380 },
 	titleContainer: { marginTop: 20 },
