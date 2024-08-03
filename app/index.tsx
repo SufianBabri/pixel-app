@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,8 +7,13 @@ import Logo from "../components/Logo";
 import colors from "../constants/colors";
 import { POPPINS_REGULAR } from "../constants/fonts";
 import { PathSvg, cardsUri } from "../constants/images";
+import { useGlobalContext } from "../context/GlobalProvider";
 
 export default function App() {
+	const { isLoading, isLoggedIn, user } = useGlobalContext();
+
+	if (!isLoading && isLoggedIn) return <Redirect href="/home" />;
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollViewContainer}>

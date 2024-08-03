@@ -6,5 +6,6 @@ export default {
 	"black": "#000",
 	"black.100": "#1E1E2D",
 	"black.200": "#232533",
-	"gray.100": "#CDCDE0"
+	"gray.100": "#CDCDE0",
+	"gray.200": "#7B7B8B"
 };

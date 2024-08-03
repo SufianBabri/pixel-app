@@ -1,57 +1,118 @@
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Link, router } from "expo-router";
+import { useRef, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
-import FormField from "../../components/FormField";
+import FormField, { FormFieldRef } from "../../components/FormField";
 import Logo from "../../components/Logo";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";
+import { useGlobalContext } from "../../context/GlobalProvider";
+import { createUser } from "../../services/api";
+import { parseArrayAsList } from "../../utils/formatting";
+import {
+	MAX_PASSWORD_LENGTH,
+	MAX_USERNAME_LENGTH,
+	MIN_PASSWORD_LENGTH,
+	MIN_USERNAME_LENGTH,
+	isEmailValid,
+	isPasswordLengthValid,
+	isUsernameLengthValid
+} from "../../utils/validation";
 
 export default function SignIn() {
-	const [form, setForm] = useState({
-		username: "",
-		email: "",
-		password: ""
-	});
+	const [form, setForm] = useState({ username: "", email: "", password: "" });
+	const [submitting, setSubmitting] = useState(false);
+	const emailRef = useRef<FormFieldRef>(null);
+	const passwordRef = useRef<FormFieldRef>(null);
+	const { setUser } = useGlobalContext();
 
-	function onSubmit() {
-		if (form.email === "" || form.password === "") {
-			Alert.alert("Error", "Please fill in all fields");
+	function validateForm() {
+		const errors = Array<string>();
+
+		if (!isUsernameLengthValid(form.username))
+			errors.push(
+				`Username should be between ${MIN_USERNAME_LENGTH} to ${MAX_USERNAME_LENGTH} characters long`
+			);
+		if (!isEmailValid(form.email)) errors.push("Invalid email provided");
+		if (!isPasswordLengthValid(form.password))
+			errors.push(
+				`Password should be between ${MIN_PASSWORD_LENGTH} to ${MAX_PASSWORD_LENGTH} characters long`
+			);
+
+		return parseArrayAsList(errors);
+	}
+
+	async function onSubmit() {
+		const message = validateForm();
+		if (message) return Alert.alert("Error", message);
+
+		setSubmitting(true);
+
+		try {
+			const { username, email, password } = form;
+			const user = await createUser(email, password, username);
+			setUser(user);
+
+			router.replace("/home");
+		} catch (e) {
+			let message;
+			if (e instanceof Error) message = e.message;
+			else message = "An error has occurred while trying to sign up";
+
+			Alert.alert("Error", message);
+		} finally {
+			setSubmitting(false);
 		}
 	}
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView contentContainerStyle={styles.scrollViewContent}>
+			<ScrollView
+				contentContainerStyle={styles.scrollViewContent}
+				keyboardShouldPersistTaps="handled">
 				<View style={styles.innerContainer}>
 					<Logo />
 					<Text style={styles.text}>Sign up</Text>
 
 					<FormField
+						style={styles.formElement}
 						title="Username"
-						value={form.username}
-						handleChangeText={username => setForm({ ...form, username })}
-						style={styles.formElement}
 						keyboardType="default"
+						returnKeyType="next"
+						value={form.username}
+						onSubmitEditing={() => emailRef.current?.focus()}
+						onChangeText={username => setForm({ ...form, username })}
 					/>
 					<FormField
+						ref={emailRef}
+						style={styles.formElement}
 						title="Email"
-						value={form.email}
-						handleChangeText={email => setForm({ ...form, email })}
-						style={styles.formElement}
 						keyboardType="email-address"
+						returnKeyType="next"
+						value={form.email}
+						onSubmitEditing={() => passwordRef.current?.focus()}
+						onChangeText={email => setForm({ ...form, email })}
 					/>
 
 					<FormField
-						title="Password"
-						value={form.password}
-						handleChangeText={password => setForm({ ...form, password })}
+						ref={passwordRef}
 						style={styles.formElement}
+						title="Password"
+						returnKeyType="done"
+						blurOnSubmit
+						value={form.password}
+						onSubmitEditing={onSubmit}
+						onChangeText={password => setForm({ ...form, password })}
 					/>
 
-					<CustomButton style={styles.formElement} title="Sign up" onPress={onSubmit} />
+					<CustomButton
+						style={styles.formElement}
+						title="Sign up"
+						isLoading={submitting}
+						onPress={onSubmit}
+					/>
 
 					<View style={styles.footnoteContainer}>
 						<Text style={styles.footerText}>Already have an account?</Text>
