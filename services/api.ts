@@ -105,8 +105,47 @@ async function getUserForId(userId: string) {
 	if (!docs || docs.total === 0) return null;
 
 	const { $id: id, name: username, email, avatarUrl } = docs.documents[0];
-	console.log("avatarUrl", avatarUrl);
 	const user: User = { id, username, email, avatarUrl };
 
 	return user;
+}
+
+type ApiDataResponse<T> = { data: T; error?: string } | { data?: T; error: string };
+
+export type Post = {
+	$id: string;
+	title: string;
+	thumbnailUrl: string;
+	prompt: string;
+	videoUrl: string;
+	creator: { username: string; avatarUrl: string };
+};
+
+export async function getAllPosts(): Promise<ApiDataResponse<Post[]>> {
+	try {
+		const posts = await databases.listDocuments<Models.Document & Post>(
+			CONFIG_DATABASE_ID,
+			CONFIG_VIDEOCOLLECTION_ID
+		);
+
+		return { data: posts.documents };
+	} catch (error) {
+		console.log("Error while fetching posts", error);
+		return { error: "Error occured while retrieving posts" };
+	}
+}
+
+export async function getLatestPosts(): Promise<ApiDataResponse<Post[]>> {
+	try {
+		const posts = await databases.listDocuments<Models.Document & Post>(
+			CONFIG_DATABASE_ID,
+			CONFIG_VIDEOCOLLECTION_ID,
+			[Query.orderDesc("$createdAt"), Query.limit(7)]
+		);
+
+		return { data: posts.documents };
+	} catch (error) {
+		console.log("Error while fetching latest posts", error);
+		return { error: "Error occured while retrieving latest posts" };
+	}
 }

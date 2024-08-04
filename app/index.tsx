@@ -42,7 +42,6 @@ export default function App() {
 						exploration with Pixel
 					</Text>
 					<CustomButton
-						style={styles.button}
 						title="Continue with Email"
 						onPress={() => router.push("/sign-in")}
 					/>
@@ -81,6 +80,5 @@ const styles = StyleSheet.create({
 		color: colors["gray.100"],
 		textAlign: "center",
 		marginTop: 28
-	},
-	button: { width: "100%", marginTop: 28 }
+	}
 });
