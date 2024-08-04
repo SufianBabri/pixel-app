@@ -1,3 +1,4 @@
+import ArrowLeftSvg from "../assets/icons/arrow-left.svg";
 import BookmarkSvg from "../assets/icons/bookmark.svg";
 import EyeHideSvg from "../assets/icons/eye-hide.svg";
 import EyeSvg from "../assets/icons/eye.svg";
@@ -21,5 +22,6 @@ export {
 	UploadSvg,
 	LogoutSvg,
 	EyeHideSvg,
-	EyeSvg
+	EyeSvg,
+	ArrowLeftSvg
 };

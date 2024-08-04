@@ -4,12 +4,13 @@ import { useRef, useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../../components/CustomButton";
-import FormField, { FormFieldRef } from "../../components/FormField";
-import Logo from "../../components/Logo";
+import BackButton from "../../components/back-button";
+import CustomButton from "../../components/custom-button";
+import FormField, { FormFieldRef } from "../../components/form-field";
+import Logo from "../../components/logo";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";
-import { useGlobalContext } from "../../context/GlobalProvider";
+import { useGlobalContext } from "../../context/global-provider";
 import { signIn } from "../../services/api";
 import { parseArrayAsList } from "../../utils/formatting";
 import {
@@ -67,7 +68,8 @@ export default function SignIn() {
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollViewContent}
 				keyboardShouldPersistTaps="handled">
-				<View style={styles.innerContainer}>
+				<BackButton />
+				<View style={styles.form}>
 					<Logo />
 					<Text style={styles.text}>Log in</Text>
 
@@ -116,12 +118,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors["primary"]
 	},
-	scrollViewContent: { flex: 1 },
-	innerContainer: {
+	scrollViewContent: { flexGrow: 1 },
+	form: {
 		width: "100%",
 		height: "100%",
 		alignContent: "center",
 		justifyContent: "center",
+		paddingTop: 20,
 		paddingHorizontal: 16
 	},
 	text: {

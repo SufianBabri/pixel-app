@@ -19,7 +19,10 @@ const styles = StyleSheet.create({
 		gap: 4,
 		marginBottom: 16
 	},
-	logo: { width: 40, height: 46 },
+	logo: {
+		width: 40,
+		height: 46
+	},
 	label: {
 		fontSize: 30,
 		color: "white",

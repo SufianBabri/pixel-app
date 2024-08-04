@@ -2,15 +2,15 @@ import { Redirect, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../components/CustomButton";
-import Logo from "../components/Logo";
+import CustomButton from "../components/custom-button";
+import Logo from "../components/logo";
 import colors from "../constants/colors";
 import { POPPINS_REGULAR } from "../constants/fonts";
 import { PathSvg, cardsUri } from "../constants/images";
-import { useGlobalContext } from "../context/GlobalProvider";
+import { useGlobalContext } from "../context/global-provider";
 
 export default function App() {
-	const { isLoading, isLoggedIn, user } = useGlobalContext();
+	const { isLoading, isLoggedIn } = useGlobalContext();
 
 	if (!isLoading && isLoggedIn) return <Redirect href="/home" />;
 

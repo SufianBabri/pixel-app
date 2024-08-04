@@ -1,14 +1,16 @@
+import { KeyboardAwareScrollView } from "@pietile-native-kit/keyboard-aware-scrollview";
 import { Link, router } from "expo-router";
 import { useRef, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../../components/CustomButton";
-import FormField, { FormFieldRef } from "../../components/FormField";
-import Logo from "../../components/Logo";
+import BackButton from "../../components/back-button";
+import CustomButton from "../../components/custom-button";
+import FormField, { FormFieldRef } from "../../components/form-field";
+import Logo from "../../components/logo";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";
-import { useGlobalContext } from "../../context/GlobalProvider";
+import { useGlobalContext } from "../../context/global-provider";
 import { createUser } from "../../services/api";
 import { parseArrayAsList } from "../../utils/formatting";
 import {
@@ -69,10 +71,11 @@ export default function SignIn() {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView
+			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollViewContent}
 				keyboardShouldPersistTaps="handled">
-				<View style={styles.innerContainer}>
+				<BackButton />
+				<View style={styles.form}>
 					<Logo />
 					<Text style={styles.text}>Sign up</Text>
 
@@ -121,7 +124,7 @@ export default function SignIn() {
 						</Link>
 					</View>
 				</View>
-			</ScrollView>
+			</KeyboardAwareScrollView>
 		</SafeAreaView>
 	);
 }
@@ -132,11 +135,12 @@ const styles = StyleSheet.create({
 		backgroundColor: colors["primary"]
 	},
 	scrollViewContent: { flex: 1 },
-	innerContainer: {
+	form: {
 		width: "100%",
 		height: "100%",
 		alignContent: "center",
 		justifyContent: "center",
+		paddingTop: 20,
 		paddingHorizontal: 16
 	},
 	text: {

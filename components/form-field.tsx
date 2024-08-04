@@ -39,6 +39,7 @@ function FormField(
 	}: Props,
 	ref: ForwardedRef<FormFieldRef>
 ) {
+	const [isFocused, setIsFocused] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const inputRef = useRef<TextInput>(null);
 
@@ -52,17 +53,19 @@ function FormField(
 		<View style={[styles.container, style]}>
 			<Text style={styles.title}>{title}</Text>
 
-			<View style={styles.inputContainer}>
+			<View style={[styles.inputContainer, isFocused && styles.inputContainerFocused]}>
 				<TextInput
 					ref={inputRef}
 					style={styles.input}
 					value={value}
 					placeholder={placeholder}
-					placeholderTextColor={colors["gray.200"]}
+					placeholderTextColor={colors["placeholder"]}
 					secureTextEntry={title === "Password" && !showPassword}
 					keyboardType={keyboardType}
 					returnKeyType={returnKeyType}
 					blurOnSubmit={blurOnSubmit}
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => setIsFocused(false)}
 					onSubmitEditing={onSubmitEditing}
 					onChangeText={onChangeText}
 				/>
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		width: "100%",
-		backgroundColor: colors["black.200"],
+		backgroundColor: colors["black.100"],
 		borderRadius: 20,
 		borderWidth: 2,
 		borderColor: colors["black.100"],
@@ -100,6 +103,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingRight: 16,
 		marginTop: 8
+	},
+	inputContainerFocused: {
+		borderColor: colors["secondary"]
 	},
 	input: {
 		flex: 1,
