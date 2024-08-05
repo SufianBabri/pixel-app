@@ -25,7 +25,7 @@ export default function Search() {
 	return (
 		<SafeAreaView style={styles.container}>
 			{loading ? (
-				<Loader isLoading={loading} />
+				<Loader />
 			) : (
 				<FlatList
 					data={postsResponse?.data}

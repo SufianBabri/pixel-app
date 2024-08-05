@@ -1,5 +1,4 @@
-import { Text, TouchableOpacity, ViewStyle } from "react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
 import colors from "../constants/colors";
 import { POPPINS_SEMIBOLD } from "../constants/fonts";
 

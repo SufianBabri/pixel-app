@@ -1,5 +1,4 @@
-import { Text, View } from "react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { POPPINS_BOLD } from "../constants/fonts";
 import { LogoSvg } from "../constants/images";
 

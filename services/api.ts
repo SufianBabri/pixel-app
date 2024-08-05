@@ -26,8 +26,13 @@ const avatars = new Avatars(client);
 const databases = new Databases(client);
 
 export type User = { id: string; username: string; email: string; avatarUrl: string };
+type ApiUserResponse = { user: User; error?: string } | { user?: User; error: string };
 
-export async function createUser(email: string, password: string, username: string) {
+export async function createUser(
+	email: string,
+	password: string,
+	username: string
+): Promise<ApiUserResponse> {
 	try {
 		const newAccount = await account.create(ID.unique(), email, password, username);
 
@@ -51,23 +56,33 @@ export async function createUser(email: string, password: string, username: stri
 			avatarUrl: avatarUrl.toString()
 		};
 
-		return user;
+		return { user };
 	} catch (error) {
-		throw error;
+		console.log("An error has occurred while signing up", error);
+
+		let message;
+		if (error instanceof Error) message = error.message;
+		else message = "An error has occurred while trying to sign up";
+
+		return { error: message };
 	}
 }
 
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, password: string): Promise<ApiUserResponse> {
 	try {
 		const session = await account.createEmailPasswordSession(email, password);
 		const user = await getUserForId(session.userId);
 
-		return user;
+		if (!user) return { error: "An error occured while signing in" };
+
+		return { user };
 	} catch (error) {
-		if (error instanceof AppwriteException) {
-			console.log("errorCode", error.code);
-		}
-		throw error;
+		console.log("Error while signing in", error);
+		let message;
+		if (error instanceof Error) message = error.message;
+		else message = "An error has occurred while trying to sign in";
+
+		return { error: message };
 	}
 }
 

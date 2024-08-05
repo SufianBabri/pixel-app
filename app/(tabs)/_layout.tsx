@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import { FC } from "react";
-import { Text, View } from "react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SvgProps } from "react-native-svg";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";

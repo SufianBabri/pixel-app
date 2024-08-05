@@ -1,5 +1,4 @@
-import { FlatList, RefreshControl, SafeAreaView } from "react-native";
-import { StyleSheet } from "react-native";
+import { FlatList, RefreshControl, SafeAreaView, StyleSheet } from "react-native";
 import EmptyState from "../../components/empty-state";
 import HomeListHeader from "../../components/home-list-header";
 import Loader from "../../components/loader";
@@ -15,7 +14,7 @@ export default function Home() {
 	return (
 		<SafeAreaView style={styles.container}>
 			{loading ? (
-				<Loader isLoading={loading} />
+				<Loader />
 			) : (
 				<FlatList
 					data={postsResponse?.data}

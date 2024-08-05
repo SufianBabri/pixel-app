@@ -2,13 +2,13 @@ import { ForwardedRef, forwardRef, useImperativeHandle, useRef, useState } from 
 import {
 	KeyboardType,
 	ReturnKeyType,
+	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 	ViewStyle
 } from "react-native";
-import { StyleSheet } from "react-native";
 import colors from "../constants/colors";
 import { POPPINS_MEDIUM, POPPINS_SEMIBOLD } from "../constants/fonts";
 import { EyeHideSvg, EyeSvg } from "../constants/icons";

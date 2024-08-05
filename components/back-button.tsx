@@ -1,6 +1,5 @@
 import { useRouter } from "expo-router";
-import { TouchableOpacity } from "react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { ArrowLeftSvg } from "../constants/icons";
 
 export default function BackButton() {

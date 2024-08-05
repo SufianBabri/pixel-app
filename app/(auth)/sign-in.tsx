@@ -1,8 +1,7 @@
 import { KeyboardAwareScrollView } from "@pietile-native-kit/keyboard-aware-scrollview";
 import { Link, router } from "expo-router";
 import { useRef, useState } from "react";
-import { Alert, Text, View } from "react-native";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "../../components/back-button";
 import CustomButton from "../../components/custom-button";
@@ -44,23 +43,16 @@ export default function SignIn() {
 
 		setSubmitting(true);
 
-		try {
-			const { email, password } = form;
-			const user = await signIn(email, password);
+		const { email, password } = form;
+		const { user, error } = await signIn(email, password);
 
+		setSubmitting(false);
+		if (user) {
 			setUser(user);
-
-			router.replace("/home");
-		} catch (e) {
-			console.log("error", e);
-			let message;
-			if (e instanceof Error) message = e.message;
-			else message = "An error has occurred while trying to sign in";
-
-			Alert.alert("Error", message);
-		} finally {
-			setSubmitting(false);
+			return router.replace("/home");
 		}
+
+		Alert.alert("Error", error);
 	}
 
 	return (
