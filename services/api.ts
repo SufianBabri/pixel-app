@@ -59,8 +59,6 @@ export async function createUser(email: string, password: string, username: stri
 
 export async function signIn(email: string, password: string) {
 	try {
-		account.deleteSession("current"); //TODO this is for testing
-
 		const session = await account.createEmailPasswordSession(email, password);
 		const user = await getUserForId(session.userId);
 
@@ -70,6 +68,16 @@ export async function signIn(email: string, password: string) {
 			console.log("errorCode", error.code);
 		}
 		throw error;
+	}
+}
+
+export async function signOut() {
+	try {
+		const session = await account.deleteSession("current");
+
+		return session;
+	} catch (error) {
+		console.log("Error occurred while signing out", error);
 	}
 }
 
@@ -104,7 +112,7 @@ async function getUserForId(userId: string) {
 
 	if (!docs || docs.total === 0) return null;
 
-	const { $id: id, name: username, email, avatarUrl } = docs.documents[0];
+	const { $id: id, username, email, avatarUrl } = docs.documents[0];
 	const user: User = { id, username, email, avatarUrl };
 
 	return user;
@@ -162,5 +170,20 @@ export async function searchPosts(query: string): Promise<ApiDataResponse<Post[]
 	} catch (error) {
 		console.log("Error while searching posts", error);
 		return { error: "Error occured while searching posts" };
+	}
+}
+
+export async function getUserPosts(userId: string): Promise<ApiDataResponse<Post[]>> {
+	try {
+		const posts = await databases.listDocuments<Models.Document & Post>(
+			CONFIG_DATABASE_ID,
+			CONFIG_VIDEO_COLLECTION_ID,
+			[Query.equal("creator", userId)]
+		);
+
+		return { data: posts.documents };
+	} catch (error) {
+		console.log("Error fetching posts of the user", error);
+		return { error: "Error occured while fetching posts" };
 	}
 }
