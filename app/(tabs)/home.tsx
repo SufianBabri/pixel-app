@@ -1,5 +1,6 @@
 import { FlatList, RefreshControl, SafeAreaView } from "react-native";
 import { StyleSheet } from "react-native";
+import EmptyState from "../../components/empty-state";
 import HomeListHeader from "../../components/home-list-header";
 import Loader from "../../components/loader";
 import VideoCard from "../../components/video-card";
@@ -23,6 +24,12 @@ export default function Home() {
 					refreshControl={<RefreshControl refreshing={refetching} onRefresh={refetch} />}
 					ListHeaderComponent={() => (
 						<HomeListHeader latestPosts={latestPostsResponse?.data ?? []} />
+					)}
+					ListEmptyComponent={() => (
+						<EmptyState
+							title="No Videos Found"
+							subtitle="Be the first one to upload a video"
+						/>
 					)}
 					renderItem={({ item }) => (
 						<VideoCard

@@ -13,8 +13,8 @@ const CONFIG_ENDPOINT = process.env.EXPO_PUBLIC_ENDPOINT ?? "";
 const CONFIG_PLATFORM = process.env.EXPO_PUBLIC_PLATFORM ?? "";
 const CONFIG_PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID ?? "";
 const CONFIG_DATABASE_ID = process.env.EXPO_PUBLIC_DATABASE_ID ?? "";
-const CONFIG_USERCOLLECTION_ID = process.env.EXPO_PUBLIC_USER_COLLECTION_ID ?? "";
-const CONFIG_VIDEOCOLLECTION_ID = process.env.EXPO_PUBLIC_VIDEO_COLLECTION_ID ?? "";
+const CONFIG_USER_COLLECTION_ID = process.env.EXPO_PUBLIC_USER_COLLECTION_ID ?? "";
+const CONFIG_VIDEO_COLLECTION_ID = process.env.EXPO_PUBLIC_VIDEO_COLLECTION_ID ?? "";
 const CONFIG_STORAGE_ID = process.env.EXPO_PUBLIC_STORAGE_ID ?? "";
 
 const client = new Client();
@@ -39,7 +39,7 @@ export async function createUser(email: string, password: string, username: stri
 
 		const userDocument = await databases.createDocument(
 			CONFIG_DATABASE_ID,
-			CONFIG_USERCOLLECTION_ID,
+			CONFIG_USER_COLLECTION_ID,
 			ID.unique(),
 			{ accountId: newAccount.$id, email, username, avatarUrl }
 		);
@@ -98,7 +98,7 @@ export async function getCurrentUser() {
 async function getUserForId(userId: string) {
 	const docs = await databases.listDocuments<Models.Document & Models.User<Models.Preferences>>(
 		CONFIG_DATABASE_ID,
-		CONFIG_USERCOLLECTION_ID,
+		CONFIG_USER_COLLECTION_ID,
 		[Query.equal("accountId", userId)]
 	);
 
@@ -125,7 +125,7 @@ export async function getAllPosts(): Promise<ApiDataResponse<Post[]>> {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEOCOLLECTION_ID
+			CONFIG_VIDEO_COLLECTION_ID
 		);
 
 		return { data: posts.documents };
@@ -139,7 +139,7 @@ export async function getLatestPosts(): Promise<ApiDataResponse<Post[]>> {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEOCOLLECTION_ID,
+			CONFIG_VIDEO_COLLECTION_ID,
 			[Query.orderDesc("$createdAt"), Query.limit(7)]
 		);
 
@@ -147,5 +147,20 @@ export async function getLatestPosts(): Promise<ApiDataResponse<Post[]>> {
 	} catch (error) {
 		console.log("Error while fetching latest posts", error);
 		return { error: "Error occured while retrieving latest posts" };
+	}
+}
+
+export async function searchPosts(query: string): Promise<ApiDataResponse<Post[]>> {
+	try {
+		const posts = await databases.listDocuments<Models.Document & Post>(
+			CONFIG_DATABASE_ID,
+			CONFIG_VIDEO_COLLECTION_ID,
+			[Query.search("title", query)]
+		);
+
+		return { data: posts.documents };
+	} catch (error) {
+		console.log("Error while searching posts", error);
+		return { error: "Error occured while searching posts" };
 	}
 }
