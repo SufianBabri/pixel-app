@@ -44,9 +44,9 @@ export default function VideoCard({
 					</View>
 				</View>
 
-				<View style={styles.menuIconContainer}>
+				<TouchableOpacity style={styles.menuIconContainer}>
 					<MenuSvg style={styles.menuIcon} />
-				</View>
+				</TouchableOpacity>
 			</View>
 
 			{play ? (

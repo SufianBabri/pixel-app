@@ -15,7 +15,7 @@ export default function Profile() {
 		async () => await getUserPosts(user?.id ?? "")
 	);
 
-	if (!user) return <Redirect href="/home" />;
+	if (!user) return <Redirect href="/sign-in" />;
 
 	async function onLogoutClick() {
 		await signOut();
