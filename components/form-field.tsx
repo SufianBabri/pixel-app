@@ -16,7 +16,9 @@ import { EyeHideSvg, EyeSvg } from "../constants/icons";
 type Props = {
 	style: ViewStyle;
 	title: string;
+	autoFocus?: boolean;
 	placeholder?: string;
+	autoCapitalize?: "none" | "sentences" | "words" | "characters" | undefined;
 	keyboardType?: KeyboardType;
 	returnKeyType?: ReturnKeyType;
 	blurOnSubmit?: boolean;
@@ -29,7 +31,9 @@ function FormField(
 	{
 		style,
 		title,
+		autoFocus = false,
 		placeholder,
+		autoCapitalize,
 		keyboardType,
 		returnKeyType,
 		blurOnSubmit = false,
@@ -58,9 +62,11 @@ function FormField(
 					ref={inputRef}
 					style={styles.input}
 					value={value}
+					autoFocus={autoFocus}
 					placeholder={placeholder}
 					placeholderTextColor={colors["placeholder"]}
 					secureTextEntry={title === "Password" && !showPassword}
+					autoCapitalize={autoCapitalize}
 					keyboardType={keyboardType}
 					returnKeyType={returnKeyType}
 					blurOnSubmit={blurOnSubmit}

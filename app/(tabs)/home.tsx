@@ -1,15 +1,26 @@
+import { Redirect } from "expo-router";
 import { FlatList, RefreshControl, SafeAreaView, StyleSheet } from "react-native";
 import EmptyState from "../../components/empty-state";
 import HomeListHeader from "../../components/home-list-header";
 import Loader from "../../components/loader";
 import VideoCard from "../../components/video-card";
 import colors from "../../constants/colors";
+import { useGlobalContext } from "../../context/global-provider";
 import useApi from "../../hooks/use-api";
 import { getAllPosts, getLatestPosts } from "../../services/api";
 
 export default function Home() {
+	const { user } = useGlobalContext();
 	const { response: latestPostsResponse } = useApi(getLatestPosts);
-	const { response: postsResponse, loading, refetch, refetching } = useApi(getAllPosts);
+	const {
+		response: postsResponse,
+		loading,
+		refetch,
+		refetching,
+		handlePostDeleted
+	} = useApi(getAllPosts);
+
+	if (!user) return <Redirect href="/sign-in" />;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -31,20 +42,13 @@ export default function Home() {
 						/>
 					)}
 					renderItem={({ item }) => (
-						<VideoCard
-							title={item.title}
-							thumbnail={item.thumbnailUrl}
-							video={item.videoUrl}
-							creatorName={item.creator.username}
-							creatorAvatarUrl={item.creator.avatarUrl}
-						/>
+						<VideoCard post={item} user={user} onPostDeleted={handlePostDeleted} />
 					)}
 				/>
 			)}
 		</SafeAreaView>
 	);
 }
-
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,

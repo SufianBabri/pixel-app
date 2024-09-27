@@ -1,11 +1,11 @@
 import { KeyboardAwareScrollView } from "@pietile-native-kit/keyboard-aware-scrollview";
 import { Link, router } from "expo-router";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "../../components/back-button";
 import CustomButton from "../../components/custom-button";
-import FormField, { FormFieldRef } from "../../components/form-field";
+import FormField, { type FormFieldRef } from "../../components/form-field";
 import Logo from "../../components/logo";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";
@@ -25,7 +25,7 @@ export default function SignIn() {
 	const [submitting, setSubmitting] = useState(false);
 	const passwordRef = useRef<FormFieldRef>(null);
 
-	function validateForm() {
+	const validateForm = useCallback(() => {
 		const errors = Array<string>();
 
 		if (!isEmailValid(form.email)) errors.push("Invalid email provided");
@@ -35,9 +35,9 @@ export default function SignIn() {
 			);
 
 		return parseArrayAsList(errors);
-	}
+	}, [form]);
 
-	async function onSubmit() {
+	const onSubmit = useCallback(async () => {
 		const message = validateForm();
 		if (message) return Alert.alert("Error", message);
 
@@ -49,11 +49,11 @@ export default function SignIn() {
 		setSubmitting(false);
 		if (user) {
 			setUser(user);
-			return router.replace("/home");
+			router.replace("/home");
+		} else {
+			Alert.alert("Error", error);
 		}
-
-		Alert.alert("Error", error);
-	}
+	}, [form, setUser, validateForm]);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -68,6 +68,8 @@ export default function SignIn() {
 					<FormField
 						style={styles.formElement}
 						title="Email"
+						autoFocus
+						autoCapitalize="none"
 						keyboardType="email-address"
 						returnKeyType="next"
 						value={form.email}
@@ -79,6 +81,7 @@ export default function SignIn() {
 						ref={passwordRef}
 						style={styles.formElement}
 						title="Password"
+						autoCapitalize="none"
 						returnKeyType="done"
 						blurOnSubmit
 						value={form.password}

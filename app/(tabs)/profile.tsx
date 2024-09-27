@@ -1,5 +1,6 @@
 import { Redirect, router } from "expo-router";
-import { FlatList, SafeAreaView, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { FlatList, ListRenderItemInfo, SafeAreaView, StyleSheet } from "react-native";
 import EmptyState from "../../components/empty-state";
 import Loader from "../../components/loader";
 import ProfileListHeader from "../../components/profile-list-header";
@@ -7,23 +8,36 @@ import VideoCard from "../../components/video-card";
 import colors from "../../constants/colors";
 import { useGlobalContext } from "../../context/global-provider";
 import useApi from "../../hooks/use-api";
-import { getUserPosts, signOut } from "../../services/api";
+import { Post, getUserPosts, signOut } from "../../services/api";
 
 export default function Profile() {
 	const { user, setUser, setIsLoggedIn } = useGlobalContext();
-	const { response: postsResponse, loading } = useApi(
-		async () => await getUserPosts(user?.id ?? "")
-	);
+	const fetchPosts = useCallback(async () => await getUserPosts(user?.id ?? ""), [user?.id]);
+	const { response: postsResponse, loading } = useApi(fetchPosts);
 
-	if (!user) return <Redirect href="/sign-in" />;
-
-	async function onLogoutClick() {
+	const onLogoutClick = useCallback(async () => {
 		await signOut();
 		setUser(null);
 		setIsLoggedIn(false);
 
 		router.replace("/sign-in");
-	}
+	}, [setUser, setIsLoggedIn]);
+	const renderPost = useCallback(
+		({ item }: ListRenderItemInfo<Post>) => {
+			if (!user) return null;
+
+			return (
+				<VideoCard
+					post={item}
+					user={user}
+					onPostDeleted={id => console.log("delelte-clicked", id)}
+				/>
+			);
+		},
+		[user]
+	);
+
+	if (!user) return <Redirect href="/sign-in" />;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -37,7 +51,7 @@ export default function Profile() {
 					ListHeaderComponent={
 						<ProfileListHeader
 							user={user}
-							posts={postsResponse?.data ?? []}
+							postsCount={postsResponse?.data?.length ?? 0}
 							onLogoutClick={onLogoutClick}
 						/>
 					}
@@ -47,15 +61,7 @@ export default function Profile() {
 							subtitle="No videos found for this profile"
 						/>
 					)}
-					renderItem={({ item }) => (
-						<VideoCard
-							title={item.title}
-							thumbnail={item.thumbnailUrl}
-							video={item.videoUrl}
-							creatorName={item.creator.username}
-							creatorAvatarUrl={item.creator.avatarUrl}
-						/>
-					)}
+					renderItem={renderPost}
 				/>
 			)}
 		</SafeAreaView>

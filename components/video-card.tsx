@@ -3,24 +3,28 @@ import { useState } from "react";
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import colors from "../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../constants/fonts";
-import { MenuSvg, PlaySvg } from "../constants/icons";
+import { PlaySvg } from "../constants/icons";
+import { Post, User, deletePost } from "../services/api";
+import OverflowMenu from "./overflow-menu";
 
 type Props = {
-	title: string;
-	thumbnail: string;
-	video: string;
-	creatorName: string;
-	creatorAvatarUrl: string;
+	post: Post;
+	user: User;
+	onPostDeleted: (id: string) => void;
 };
 
-export default function VideoCard({
-	title,
-	creatorName,
-	creatorAvatarUrl,
-	thumbnail,
-	video
-}: Props) {
+export default function VideoCard({ post, user, onPostDeleted }: Props) {
+	const { title, creator, thumbnailUrl, videoUrl } = post;
 	const [play, setPlay] = useState(false);
+
+	async function onBookmark() {
+		// await bookmarkPost($id, userId);
+	}
+
+	async function onDelete() {
+		const isDeleted = await deletePost(post, user.username);
+		if (isDeleted) onPostDeleted(post.$id);
+	}
 
 	return (
 		<View style={styles.container}>
@@ -28,7 +32,7 @@ export default function VideoCard({
 				<View style={styles.userDetails}>
 					<View style={styles.avatarContainer}>
 						<Image
-							source={{ uri: creatorAvatarUrl }}
+							source={{ uri: creator.avatarUrl }}
 							style={styles.avatar}
 							resizeMode="cover"
 						/>
@@ -39,19 +43,22 @@ export default function VideoCard({
 							{title}
 						</Text>
 						<Text style={styles.creator} numberOfLines={1}>
-							{creatorName}
+							{creator.username}
 						</Text>
 					</View>
 				</View>
 
-				<TouchableOpacity style={styles.menuIconContainer}>
-					<MenuSvg style={styles.menuIcon} />
-				</TouchableOpacity>
+				<OverflowMenu
+					style={styles.menuIconContainer}
+					showDeleteOption={creator.username === user.username}
+					onBookmark={onBookmark}
+					onDelete={onDelete}
+				/>
 			</View>
 
 			{play ? (
 				<Video
-					source={{ uri: video }}
+					source={{ uri: videoUrl }}
 					style={styles.video}
 					resizeMode={ResizeMode.CONTAIN}
 					useNativeControls
@@ -71,7 +78,7 @@ export default function VideoCard({
 					onPress={() => setPlay(true)}
 					style={styles.thumbnailContainer}>
 					<Image
-						source={{ uri: thumbnail }}
+						source={{ uri: thumbnailUrl }}
 						style={styles.thumbnail}
 						resizeMode="cover"
 					/>
@@ -135,10 +142,6 @@ const styles = StyleSheet.create({
 	},
 	menuIconContainer: {
 		paddingTop: 8
-	},
-	menuIcon: {
-		width: 20,
-		height: 20
 	},
 	video: {
 		width: "100%",

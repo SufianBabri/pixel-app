@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
-import { FC } from "react";
+import type { FC } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { SvgProps } from "react-native-svg";
+import type { SvgProps } from "react-native-svg";
 import colors from "../../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../../constants/fonts";
 import { BookmarkSvg, HomeSvg, PlusSvg, ProfileSvg } from "../../constants/icons";
@@ -76,7 +76,12 @@ export default function TabsLayout() {
 	);
 }
 
-type TabIconProps = { Icon: FC<SvgProps>; color: string; name: string; focused: boolean };
+type TabIconProps = {
+	Icon: FC<SvgProps>;
+	color: string;
+	name: string;
+	focused: boolean;
+};
 
 const TabIcon = ({ Icon, color, name, focused }: TabIconProps) => {
 	return (

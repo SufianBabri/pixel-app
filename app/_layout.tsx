@@ -1,6 +1,7 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { MenuProvider } from "react-native-popup-menu";
 import GlobalProvider from "../context/global-provider";
 
 SplashScreen.preventAutoHideAsync();
@@ -26,12 +27,14 @@ export default function RootLayout() {
 	if (!fontsLoaded && !error) return null;
 
 	return (
-		<GlobalProvider>
-			<Stack screenOptions={{ headerShown: false }}>
-				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-				<Stack.Screen name="search/[query]" options={{ headerShown: false }} />
-			</Stack>
-		</GlobalProvider>
+		<MenuProvider>
+			<GlobalProvider>
+				<Stack screenOptions={{ headerShown: false }}>
+					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+					<Stack.Screen name="index" options={{ headerShown: false }} />
+					<Stack.Screen name="search/[query]" options={{ headerShown: false }} />
+				</Stack>
+			</GlobalProvider>
+		</MenuProvider>
 	);
 }

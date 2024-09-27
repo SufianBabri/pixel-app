@@ -1,26 +1,30 @@
-import { useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { Redirect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect } from "react";
 import { FlatList, SafeAreaView, StyleSheet } from "react-native";
 import EmptyState from "../../components/empty-state";
 import Loader from "../../components/loader";
 import SearchListHeader from "../../components/search-list-header";
 import VideoCard from "../../components/video-card";
 import colors from "../../constants/colors";
+import { useGlobalContext } from "../../context/global-provider";
 import useApi from "../../hooks/use-api";
 import { searchPosts } from "../../services/api";
 
 export default function Search() {
 	const { query } = useLocalSearchParams();
 	const queryString = Array.isArray(query) ? query[0] : query ?? "";
-	const {
-		response: postsResponse,
-		loading,
-		refetch
-	} = useApi(async () => await searchPosts(queryString));
+	const fetchQueriedPosts = useCallback(
+		async () => await searchPosts(queryString),
+		[queryString]
+	);
+	const { response: postsResponse, loading, refetch } = useApi(fetchQueriedPosts);
+	const { user } = useGlobalContext();
 
 	useEffect(() => {
 		refetch();
-	}, [queryString]);
+	}, [refetch]);
+
+	if (!user) return <Redirect href="/sign-in" />;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -40,11 +44,9 @@ export default function Search() {
 					)}
 					renderItem={({ item }) => (
 						<VideoCard
-							title={item.title}
-							thumbnail={item.thumbnailUrl}
-							video={item.videoUrl}
-							creatorName={item.creator.username}
-							creatorAvatarUrl={item.creator.avatarUrl}
+							post={item}
+							user={user}
+							onPostDeleted={id => console.log("delelte-clicked", id)}
 						/>
 					)}
 				/>

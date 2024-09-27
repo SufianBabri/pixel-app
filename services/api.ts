@@ -1,4 +1,4 @@
-import { ImagePickerAsset } from "expo-image-picker";
+import type { ImagePickerAsset } from "expo-image-picker";
 import {
 	Account,
 	Avatars,
@@ -6,7 +6,7 @@ import {
 	Databases,
 	ID,
 	ImageGravity,
-	Models,
+	type Models,
 	Query,
 	Storage
 } from "react-native-appwrite";
@@ -16,7 +16,7 @@ const CONFIG_PLATFORM = process.env.EXPO_PUBLIC_PLATFORM ?? "";
 const CONFIG_PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID ?? "";
 const CONFIG_DATABASE_ID = process.env.EXPO_PUBLIC_DATABASE_ID ?? "";
 const CONFIG_USER_COLLECTION_ID = process.env.EXPO_PUBLIC_USER_COLLECTION_ID ?? "";
-const CONFIG_VIDEO_COLLECTION_ID = process.env.EXPO_PUBLIC_VIDEO_COLLECTION_ID ?? "";
+const CONFIG_POST_COLLECTION_ID = process.env.EXPO_PUBLIC_POST_COLLECTION_ID ?? "";
 const CONFIG_STORAGE_ID = process.env.EXPO_PUBLIC_STORAGE_ID ?? "";
 
 const client = new Client();
@@ -28,7 +28,12 @@ const avatars = new Avatars(client);
 const storage = new Storage(client);
 const databases = new Databases(client);
 
-export type User = { id: string; username: string; email: string; avatarUrl: string };
+export type User = {
+	id: string;
+	username: string;
+	email: string;
+	avatarUrl: string;
+};
 type ApiUserResponse = { user: User; error?: string } | { user?: User; error: string };
 
 export async function createUser(
@@ -63,7 +68,7 @@ export async function createUser(
 	} catch (error) {
 		console.log("An error has occurred while signing up", error);
 
-		let message;
+		let message: string;
 		if (error instanceof Error) message = error.message;
 		else message = "An error has occurred while trying to sign up";
 
@@ -81,7 +86,7 @@ export async function signIn(email: string, password: string): Promise<ApiUserRe
 		return { user };
 	} catch (error) {
 		console.log("Error while signing in", error);
-		let message;
+		let message: string;
 		if (error instanceof Error) message = error.message;
 		else message = "An error has occurred while trying to sign in";
 
@@ -105,6 +110,7 @@ async function getIdOfLoggedInUser() {
 
 		return $id;
 	} catch (error) {
+		console.log("Error occurred while getting logged in user", error);
 		return null;
 	}
 }
@@ -138,20 +144,22 @@ async function getUserForId(userId: string) {
 
 type ApiDataResponse<T> = { data: T; error?: string } | { data?: T; error: string };
 
+export type Creator = { username: string; avatarUrl: string };
+
 export type Post = {
 	$id: string;
 	title: string;
 	thumbnailUrl: string;
 	prompt: string;
 	videoUrl: string;
-	creator: { username: string; avatarUrl: string };
+	creator: Creator;
 };
 
-export async function getAllPosts(): Promise<ApiDataResponse<Post[]>> {
+export async function getAllPosts() {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEO_COLLECTION_ID,
+			CONFIG_POST_COLLECTION_ID,
 			[Query.orderDesc("$createdAt")]
 		);
 
@@ -162,11 +170,11 @@ export async function getAllPosts(): Promise<ApiDataResponse<Post[]>> {
 	}
 }
 
-export async function getLatestPosts(): Promise<ApiDataResponse<Post[]>> {
+export async function getLatestPosts() {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEO_COLLECTION_ID,
+			CONFIG_POST_COLLECTION_ID,
 			[Query.orderDesc("$createdAt"), Query.limit(7)]
 		);
 
@@ -177,11 +185,13 @@ export async function getLatestPosts(): Promise<ApiDataResponse<Post[]>> {
 	}
 }
 
-export async function searchPosts(query: string): Promise<ApiDataResponse<Post[]>> {
+export async function searchPosts(
+	query: string
+): Promise<ApiDataResponse<(Models.Document & Post)[]>> {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEO_COLLECTION_ID,
+			CONFIG_POST_COLLECTION_ID,
 			[Query.search("title", query)]
 		);
 
@@ -192,11 +202,13 @@ export async function searchPosts(query: string): Promise<ApiDataResponse<Post[]
 	}
 }
 
-export async function getUserPosts(userId: string): Promise<ApiDataResponse<Post[]>> {
+export async function getUserPosts(
+	userId: string
+): Promise<ApiDataResponse<(Models.Document & Post)[]>> {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEO_COLLECTION_ID,
+			CONFIG_POST_COLLECTION_ID,
 			[Query.equal("creator", userId), Query.orderDesc("$createdAt")]
 		);
 
@@ -210,7 +222,7 @@ export async function getUserPosts(userId: string): Promise<ApiDataResponse<Post
 type FileCategory = "video" | "image";
 
 export async function getFilePreview(fileId: string, category: FileCategory) {
-	let fileUrl;
+	let fileUrl: URL | null = null;
 
 	try {
 		if (category === "video") fileUrl = storage.getFileView(CONFIG_STORAGE_ID, fileId);
@@ -225,21 +237,28 @@ export async function getFilePreview(fileId: string, category: FileCategory) {
 			);
 		}
 		if (!fileUrl)
-			return { error: "Error occurred while generating preview of the ${category}" };
+			return {
+				error: "Error occurred while generating preview of the ${category}"
+			};
 
 		return { fileUrl };
 	} catch (error) {
 		if (error instanceof Error) return { error: error.message };
-		return { error: "Error occurred while generating preview of the ${category}" };
+		return {
+			error: "Error occurred while generating preview of the ${category}"
+		};
 	}
 }
 
-export async function uploadFile(file: ImagePickerAsset, category: FileCategory) {
+export async function uploadFile(
+	file: ImagePickerAsset,
+	category: FileCategory
+): Promise<{ fileUrl: URL; error?: string } | { fileUrl?: URL; error: string }> {
 	if (!file.mimeType) return { error: `mimetype of ${category} not recognized` };
 	if (!file.fileSize) return { error: `${category} file seems to be empty` };
 
 	const asset = {
-		name: file.fileName ?? "file" + Math.random() * 100,
+		name: file.fileName ?? `file${Math.random() * 100}`,
 		type: file.mimeType,
 		size: file.fileSize,
 		uri: file.uri
@@ -247,8 +266,7 @@ export async function uploadFile(file: ImagePickerAsset, category: FileCategory)
 	try {
 		const uploadedFile = await storage.createFile(CONFIG_STORAGE_ID, ID.unique(), asset);
 
-		const res = await getFilePreview(uploadedFile.$id, category);
-		return res;
+		return await getFilePreview(uploadedFile.$id, category);
 	} catch (error) {
 		if (error instanceof Error) return { error: error.message };
 		return { error: `An error occurred while uploading ${category}` };
@@ -262,7 +280,7 @@ export type NewPost = {
 	prompt: string;
 };
 
-export async function createVideoPost(form: NewPost, userId: string) {
+export async function createPost(form: NewPost, userId: string) {
 	try {
 		if (!form.thumbnailAsset || !form.videoAsset)
 			return { error: "Video and thumbnails are both required!" };
@@ -275,12 +293,12 @@ export async function createVideoPost(form: NewPost, userId: string) {
 			uploadFile(form.videoAsset, "video")
 		]);
 
-		if (thumbnailError && videoError) return { error: thumbnailError + " and " + videoError };
+		if (thumbnailError && videoError) return { error: `${thumbnailError} and ${videoError}` };
 		if (thumbnailError || videoError) return { error: thumbnailError ?? videoError };
 
 		const post = await databases.createDocument<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
-			CONFIG_VIDEO_COLLECTION_ID,
+			CONFIG_POST_COLLECTION_ID,
 			ID.unique(),
 			{
 				title: form.title,
@@ -297,4 +315,25 @@ export async function createVideoPost(form: NewPost, userId: string) {
 		if (error instanceof Error) return { error: error.message };
 		return { error: "An error occurred while creating post" };
 	}
+}
+
+export async function deletePost(post: Post, username: string) {
+	try {
+		console.log("inside-delete");
+		if (post.creator.username !== username) return false;
+		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.videoUrl));
+		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.thumbnailUrl));
+		await databases.deleteDocument(CONFIG_DATABASE_ID, CONFIG_POST_COLLECTION_ID, post.$id);
+
+		console.log("deleted");
+		return true;
+	} catch (error) {
+		console.log("Error deleting post", error);
+		return { error: "Error occured while deleting post" };
+	}
+}
+
+function getIdFromUrl(url: string) {
+	const arr = url.split("/");
+	return arr[arr.length - 2];
 }

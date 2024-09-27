@@ -1,16 +1,17 @@
 import { ResizeMode, Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
+import { useCallback } from "react";
 import { useState } from "react";
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/custom-button";
 import FormField from "../../components/form-field";
 import colors from "../../constants/colors";
-import { POPPINS_SEMIBOLD } from "../../constants/fonts";
+import { POPPINS_MEDIUM, POPPINS_SEMIBOLD } from "../../constants/fonts";
 import { UploadSvg } from "../../constants/icons";
 import { useGlobalContext } from "../../context/global-provider";
-import { NewPost, createVideoPost } from "../../services/api";
+import { type NewPost, createPost } from "../../services/api";
 
 export default function Create() {
 	const { user } = useGlobalContext();
@@ -21,9 +22,8 @@ export default function Create() {
 		thumbnailAsset: null,
 		prompt: ""
 	});
-	if (!user) return <Redirect href="/sign-in" />;
 
-	async function openPicker(selectType: "video" | "image") {
+	const openPicker = useCallback(async (selectType: "video" | "image") => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes:
 				selectType === "video"
@@ -35,18 +35,21 @@ export default function Create() {
 
 		if (result.canceled) return;
 
-		if (selectType === "image") setForm({ ...form, thumbnailAsset: result.assets[0] });
+		if (selectType === "image")
+			setForm(prev => ({ ...prev, thumbnailAsset: result.assets[0] }));
 
-		if (selectType === "video") setForm({ ...form, videoAsset: result.assets[0] });
-	}
+		if (selectType === "video") setForm(prev => ({ ...prev, videoAsset: result.assets[0] }));
+	}, []);
 
-	const submit = async () => {
+	const submit = useCallback(async () => {
+		if (!user) return;
+
 		if (form.prompt === "" || form.title === "" || !form.thumbnailAsset || !form.videoAsset) {
 			return Alert.alert("Please provide all fields");
 		}
 
 		setUploading(true);
-		const { error } = await createVideoPost(form, user.id);
+		const { error } = await createPost(form, user.id);
 		setUploading(false);
 
 		if (error) {
@@ -57,7 +60,9 @@ export default function Create() {
 
 		Alert.alert("Success", "Post uploaded successfully");
 		router.push("/home");
-	};
+	}, [form, user]);
+
+	if (!user) return <Redirect href="/sign-in" />;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
 	subHeaderText: {
 		fontSize: 16,
 		color: colors["gray.100"],
-		fontFamily: "Poppins-Medium" // Assuming 'font-pmedium'
+		fontFamily: POPPINS_MEDIUM
 	},
 	videoPlayer: {
 		width: "100%",
@@ -216,8 +221,8 @@ const styles = StyleSheet.create({
 	},
 	chooseFileText: {
 		fontSize: 14,
-		color: "#CDCDE0",
-		fontFamily: "Poppins-Medium",
+		color: "#cdcde0",
+		fontFamily: POPPINS_MEDIUM,
 		marginLeft: 8
 	},
 	submitButtonMargin: {

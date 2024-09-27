@@ -1,12 +1,12 @@
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import colors from "../constants/colors";
 import { LogoutSvg } from "../constants/icons";
-import { Post, User } from "../services/api";
+import { User } from "../services/api";
 import InfoBox from "./info-box";
 
-type Props = { user: User; posts: Post[]; onLogoutClick: () => Promise<void> };
+type Props = { user: User; postsCount: number; onLogoutClick: () => Promise<void> };
 
-export default function ProfileListHeader({ user, posts, onLogoutClick }: Props) {
+export default function ProfileListHeader({ user, postsCount, onLogoutClick }: Props) {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity onPress={onLogoutClick} style={styles.logoutButton}>
@@ -25,7 +25,7 @@ export default function ProfileListHeader({ user, posts, onLogoutClick }: Props)
 
 			<View style={styles.statsContainer}>
 				<InfoBox
-					title={posts.length || 0}
+					title={postsCount}
 					subtitle="Posts"
 					titleStyle={styles.statsTitle}
 					containerStyle={styles.statsBoxContainer}

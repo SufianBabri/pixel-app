@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 		fontFamily: POPPINS_SEMIBOLD
 	},
 	subtitle: {
-		color: "#CDCDE0",
+		color: "#cdcde0",
 		fontSize: 14,
 		textAlign: "center",
 		fontFamily: POPPINS_REGULAR
