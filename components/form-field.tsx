@@ -1,13 +1,13 @@
-import { ForwardedRef, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { type ForwardedRef, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import {
-	KeyboardType,
-	ReturnKeyType,
+	type KeyboardType,
+	type ReturnKeyType,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
-	ViewStyle
+	type ViewStyle
 } from "react-native";
 import colors from "../constants/colors";
 import { POPPINS_MEDIUM, POPPINS_SEMIBOLD } from "../constants/fonts";
@@ -16,6 +16,7 @@ import { EyeHideSvg, EyeSvg } from "../constants/icons";
 type Props = {
 	style: ViewStyle;
 	title: string;
+	autoCorrect?: boolean;
 	autoFocus?: boolean;
 	placeholder?: string;
 	autoCapitalize?: "none" | "sentences" | "words" | "characters" | undefined;
@@ -31,6 +32,7 @@ function FormField(
 	{
 		style,
 		title,
+		autoCorrect = false,
 		autoFocus = false,
 		placeholder,
 		autoCapitalize,
@@ -63,6 +65,7 @@ function FormField(
 					style={styles.input}
 					value={value}
 					autoFocus={autoFocus}
+					autoCorrect={autoCorrect}
 					placeholder={placeholder}
 					placeholderTextColor={colors["placeholder"]}
 					secureTextEntry={title === "Password" && !showPassword}

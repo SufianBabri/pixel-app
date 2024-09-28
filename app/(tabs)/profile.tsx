@@ -1,6 +1,6 @@
 import { Redirect, router } from "expo-router";
 import { useCallback } from "react";
-import { FlatList, ListRenderItemInfo, SafeAreaView, StyleSheet } from "react-native";
+import { FlatList, type ListRenderItemInfo, SafeAreaView, StyleSheet } from "react-native";
 import EmptyState from "../../components/empty-state";
 import Loader from "../../components/loader";
 import ProfileListHeader from "../../components/profile-list-header";
@@ -8,7 +8,7 @@ import VideoCard from "../../components/video-card";
 import colors from "../../constants/colors";
 import { useGlobalContext } from "../../context/global-provider";
 import useApi from "../../hooks/use-api";
-import { Post, getUserPosts, signOut } from "../../services/api";
+import { type Post, getUserPosts, signOut } from "../../services/api";
 
 export default function Profile() {
 	const { user, setUser, setIsLoggedIn } = useGlobalContext();

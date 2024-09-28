@@ -14,17 +14,17 @@ import { useGlobalContext } from "../../context/global-provider";
 import { createUser } from "../../services/api";
 import { parseArrayAsList } from "../../utils/formatting";
 import {
+	MAX_NAME_LENGTH,
 	MAX_PASSWORD_LENGTH,
-	MAX_USERNAME_LENGTH,
+	MIN_NAME_LENGTH,
 	MIN_PASSWORD_LENGTH,
-	MIN_USERNAME_LENGTH,
 	isEmailValid,
-	isPasswordLengthValid,
-	isUsernameLengthValid
+	isNameLengthValid,
+	isPasswordLengthValid
 } from "../../utils/validation";
 
 export default function SignIn() {
-	const [form, setForm] = useState({ username: "", email: "", password: "" });
+	const [form, setForm] = useState({ name: "", email: "", password: "" });
 	const [submitting, setSubmitting] = useState(false);
 	const emailRef = useRef<FormFieldRef>(null);
 	const passwordRef = useRef<FormFieldRef>(null);
@@ -33,9 +33,9 @@ export default function SignIn() {
 	const validateForm = useCallback(() => {
 		const errors = Array<string>();
 
-		if (!isUsernameLengthValid(form.username))
+		if (!isNameLengthValid(form.name))
 			errors.push(
-				`Username should be between ${MIN_USERNAME_LENGTH} to ${MAX_USERNAME_LENGTH} characters long`
+				`Name should be between ${MIN_NAME_LENGTH} to ${MAX_NAME_LENGTH} characters long`
 			);
 		if (!isEmailValid(form.email)) errors.push("Invalid email provided");
 		if (!isPasswordLengthValid(form.password))
@@ -52,8 +52,8 @@ export default function SignIn() {
 
 		setSubmitting(true);
 
-		const { username, email, password } = form;
-		const { user, error } = await createUser(email, password, username);
+		const { name, email, password } = form;
+		const { user, error } = await createUser(email, password, name);
 
 		setSubmitting(false);
 		if (user) {
@@ -76,13 +76,13 @@ export default function SignIn() {
 
 					<FormField
 						style={styles.formElement}
-						title="Username"
+						title="Name"
 						autoFocus
 						keyboardType="default"
 						returnKeyType="next"
-						value={form.username}
+						value={form.name}
 						onSubmitEditing={() => emailRef.current?.focus()}
-						onChangeText={username => setForm({ ...form, username })}
+						onChangeText={name => setForm({ ...form, name })}
 					/>
 					<FormField
 						ref={emailRef}

@@ -30,7 +30,7 @@ const databases = new Databases(client);
 
 export type User = {
 	id: string;
-	username: string;
+	name: string;
 	email: string;
 	avatarUrl: string;
 };
@@ -39,14 +39,14 @@ type ApiUserResponse = { user: User; error?: string } | { user?: User; error: st
 export async function createUser(
 	email: string,
 	password: string,
-	username: string
+	name: string
 ): Promise<ApiUserResponse> {
 	try {
-		const newAccount = await account.create(ID.unique(), email, password, username);
+		const newAccount = await account.create(ID.unique(), email, password, name);
 
 		if (!newAccount) throw Error;
 
-		const avatarUrl = avatars.getInitials(username);
+		const avatarUrl = avatars.getInitials(name);
 
 		await signIn(email, password);
 
@@ -54,12 +54,12 @@ export async function createUser(
 			CONFIG_DATABASE_ID,
 			CONFIG_USER_COLLECTION_ID,
 			ID.unique(),
-			{ accountId: newAccount.$id, email, username, avatarUrl }
+			{ accountId: newAccount.$id, email, name, avatarUrl }
 		);
 
 		const user: User = {
 			id: userDocument.$id,
-			username,
+			name,
 			email,
 			avatarUrl: avatarUrl.toString()
 		};
@@ -136,15 +136,15 @@ async function getUserForId(userId: string) {
 
 	if (!docs || docs.total === 0) return null;
 
-	const { $id: id, username, email, avatarUrl } = docs.documents[0];
-	const user: User = { id, username, email, avatarUrl };
+	const { $id: id, name, email, avatarUrl } = docs.documents[0];
+	const user: User = { id, name, email, avatarUrl };
 
 	return user;
 }
 
 type ApiDataResponse<T> = { data: T; error?: string } | { data?: T; error: string };
 
-export type Creator = { username: string; avatarUrl: string };
+export type Creator = { name: string; avatarUrl: string };
 
 export type Post = {
 	$id: string;
@@ -155,7 +155,7 @@ export type Post = {
 	creator: Creator;
 };
 
-export async function getAllPosts() {
+export async function getAllPosts(): Promise<ApiDataResponse<(Models.Document & Post)[]>> {
 	try {
 		const posts = await databases.listDocuments<Models.Document & Post>(
 			CONFIG_DATABASE_ID,
@@ -309,7 +309,6 @@ export async function createPost(form: NewPost, userId: string) {
 			}
 		);
 
-		console.log("post-created", post);
 		return { post };
 	} catch (error) {
 		if (error instanceof Error) return { error: error.message };
@@ -317,15 +316,13 @@ export async function createPost(form: NewPost, userId: string) {
 	}
 }
 
-export async function deletePost(post: Post, username: string) {
+export async function deletePost(post: Post, name: string) {
 	try {
-		console.log("inside-delete");
-		if (post.creator.username !== username) return false;
+		if (post.creator.name !== name) return false;
 		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.videoUrl));
 		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.thumbnailUrl));
 		await databases.deleteDocument(CONFIG_DATABASE_ID, CONFIG_POST_COLLECTION_ID, post.$id);
 
-		console.log("deleted");
 		return true;
 	} catch (error) {
 		console.log("Error deleting post", error);

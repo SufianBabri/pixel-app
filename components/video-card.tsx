@@ -4,7 +4,7 @@ import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-na
 import colors from "../constants/colors";
 import { POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../constants/fonts";
 import { PlaySvg } from "../constants/icons";
-import { Post, User, deletePost } from "../services/api";
+import { type Post, type User, deletePost } from "../services/api";
 import OverflowMenu from "./overflow-menu";
 
 type Props = {
@@ -22,7 +22,7 @@ export default function VideoCard({ post, user, onPostDeleted }: Props) {
 	}
 
 	async function onDelete() {
-		const isDeleted = await deletePost(post, user.username);
+		const isDeleted = await deletePost(post, user.name);
 		if (isDeleted) onPostDeleted(post.$id);
 	}
 
@@ -43,14 +43,14 @@ export default function VideoCard({ post, user, onPostDeleted }: Props) {
 							{title}
 						</Text>
 						<Text style={styles.creator} numberOfLines={1}>
-							{creator.username}
+							{creator.name}
 						</Text>
 					</View>
 				</View>
 
 				<OverflowMenu
 					style={styles.menuIconContainer}
-					showDeleteOption={creator.username === user.username}
+					showDeleteOption={creator.name === user.name}
 					onBookmark={onBookmark}
 					onDelete={onDelete}
 				/>

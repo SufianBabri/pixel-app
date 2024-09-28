@@ -72,9 +72,10 @@ export default function Create() {
 				<FormField
 					style={styles.formFieldMargin}
 					title="Video Title"
+					autoCorrect
 					value={form.title}
 					placeholder="Give your video a catchy title..."
-					onChangeText={e => setForm({ ...form, title: e })}
+					onChangeText={title => setForm({ ...form, title })}
 				/>
 
 				<View style={styles.uploadContainer}>
@@ -127,9 +128,10 @@ export default function Create() {
 				<FormField
 					style={styles.formFieldMargin}
 					title="AI Prompt"
+					autoCorrect
 					value={form.prompt}
 					placeholder="The AI prompt of your video...."
-					onChangeText={e => setForm({ ...form, prompt: e })}
+					onChangeText={prompt => setForm({ ...form, prompt })}
 				/>
 
 				<CustomButton

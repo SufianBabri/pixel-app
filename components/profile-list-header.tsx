@@ -1,10 +1,14 @@
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import colors from "../constants/colors";
 import { LogoutSvg } from "../constants/icons";
-import { User } from "../services/api";
+import type { User } from "../services/api";
 import InfoBox from "./info-box";
 
-type Props = { user: User; postsCount: number; onLogoutClick: () => Promise<void> };
+type Props = {
+	user: User;
+	postsCount: number;
+	onLogoutClick: () => Promise<void>;
+};
 
 export default function ProfileListHeader({ user, postsCount, onLogoutClick }: Props) {
 	return (
@@ -18,7 +22,7 @@ export default function ProfileListHeader({ user, postsCount, onLogoutClick }: P
 			</View>
 
 			<InfoBox
-				title={user.username}
+				title={user.name}
 				containerStyle={styles.infoBoxContainer}
 				titleStyle={styles.infoBoxTitle}
 			/>

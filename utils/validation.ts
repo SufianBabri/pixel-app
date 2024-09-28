@@ -11,9 +11,9 @@ export function isPasswordLengthValid(input: string) {
 	return length >= MIN_PASSWORD_LENGTH && length <= MAX_PASSWORD_LENGTH;
 }
 
-export const MIN_USERNAME_LENGTH = 1;
-export const MAX_USERNAME_LENGTH = 128;
-export function isUsernameLengthValid(input: string) {
+export const MIN_NAME_LENGTH = 1;
+export const MAX_NAME_LENGTH = 128;
+export function isNameLengthValid(input: string) {
 	const length = input.length;
-	return length >= MIN_USERNAME_LENGTH && length <= MAX_USERNAME_LENGTH;
+	return length >= MIN_NAME_LENGTH && length <= MAX_NAME_LENGTH;
 }

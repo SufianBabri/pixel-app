@@ -12,7 +12,7 @@ import { searchPosts } from "../../services/api";
 
 export default function Search() {
 	const { query } = useLocalSearchParams();
-	const queryString = Array.isArray(query) ? query[0] : query ?? "";
+	const queryString = Array.isArray(query) ? query[0] : (query ?? "");
 	const fetchQueriedPosts = useCallback(
 		async () => await searchPosts(queryString),
 		[queryString]

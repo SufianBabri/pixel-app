@@ -4,7 +4,7 @@ import colors from "../constants/colors";
 import { POPPINS_MEDIUM, POPPINS_REGULAR, POPPINS_SEMIBOLD } from "../constants/fonts";
 import { LogoSvg } from "../constants/images";
 import { useGlobalContext } from "../context/global-provider";
-import { Post } from "../services/api";
+import type { Post } from "../services/api";
 import SearchInput from "./search-input";
 import Trending from "./trending";
 
@@ -18,7 +18,7 @@ export default function HomeListHeader({ latestPosts }: Props) {
 			<View style={styles.header}>
 				<View>
 					<Text style={styles.welcomeText}>Welcome back</Text>
-					<Text style={styles.title}>{user?.username}</Text>
+					<Text style={styles.title}>{user?.name}</Text>
 				</View>
 
 				<View style={styles.logoContainer}>
