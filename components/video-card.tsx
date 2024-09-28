@@ -50,7 +50,7 @@ export default function VideoCard({ post, user, onPostDeleted }: Props) {
 
 				<OverflowMenu
 					style={styles.menuIconContainer}
-					showDeleteOption={creator.name === user.name}
+					showDeleteOption={creator.$id === user.id}
 					onBookmark={onBookmark}
 					onDelete={onDelete}
 				/>

@@ -144,7 +144,7 @@ async function getUserForId(userId: string) {
 
 type ApiDataResponse<T> = { data: T; error?: string } | { data?: T; error: string };
 
-export type Creator = { name: string; avatarUrl: string };
+export type Creator = { $id: string; name: string; avatarUrl: string };
 
 export type Post = {
 	$id: string;
@@ -316,9 +316,9 @@ export async function createPost(form: NewPost, userId: string) {
 	}
 }
 
-export async function deletePost(post: Post, name: string) {
+export async function deletePost(post: Post, userId: string) {
 	try {
-		if (post.creator.name !== name) return false;
+		if (post.creator.$id !== userId) return false;
 		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.videoUrl));
 		await storage.deleteFile(CONFIG_STORAGE_ID, getIdFromUrl(post.thumbnailUrl));
 		await databases.deleteDocument(CONFIG_DATABASE_ID, CONFIG_POST_COLLECTION_ID, post.$id);
